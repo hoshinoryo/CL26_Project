@@ -12,7 +12,7 @@
 #include "game_item.h"
 
 GameEnemy::GameEnemy(GameWorld* world, const Float2& position)
-    : GameCharacter(world, position, 80, "Enemy")
+    : GameCharacter(world, position, 60, "Enemy")
 {
     TextureAsset::Register(U"Enemy_Normal", 0xF11EA_icon, 48);
 }

@@ -20,8 +20,10 @@ private:
 public:
 
     void AddItem(GameItemType type);
+	bool RemoveItem(GameItemType type, int amount);
     int GetItemCount(GameItemType type) const;
     int GetTotalItemCount() const;
+
     bool IsEmpty() const;
     void Clear();
     void Draw(const Float2& position) const;

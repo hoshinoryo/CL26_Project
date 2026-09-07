@@ -2,7 +2,7 @@
 // Contents   : game_player.h
 //              Definition of class GamePlayer 
 // Author     : GU ANYI
-// LastUpdate : 2026/07/14
+// LastUpdate : 2026/09/08
 // Since      : 2026/06/09
 //=============================================================================
 
@@ -30,6 +30,7 @@ private:
 public:
 
     GamePlayer(GameWorld* world, const Float2& position);
+
     void Update(float delta_time) override;
     void Draw() const override;
     void Damage(const GameDamage&) override;
@@ -37,12 +38,20 @@ public:
     {
         return Circle{ GetPosition(), 64.0 };
     }
+	const GameInventory& GetInventory() const
+	{
+		return m_inventory;
+	}
+
+	bool PurchaseItem(GameItemType type);
 
 private:
     void move(float delta_time);
     void attack(float delta_time);
+
     void pickUpItems();
     void addItem(GameItemType type);
+
     void updateItemEffect(float delta_time);
     void showItemEffect(const String& text);
 };

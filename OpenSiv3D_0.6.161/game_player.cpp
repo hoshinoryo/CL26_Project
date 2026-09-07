@@ -13,6 +13,11 @@
 #include "game_item.h"
 #include "game_object_container.h"
 
+namespace
+{
+	double damage_effect_time{};
+}
+
 GamePlayer::GamePlayer(GameWorld* world, const Float2& position)
     : GameCharacter(world, position, 100, "Player")
 {
@@ -35,8 +40,15 @@ void GamePlayer::Update(float delta_time)
 
 void GamePlayer::Draw() const
 {
-	std::u32string label = m_is_attack ? U"Player_Attack" : U"Player_Normal";
-	TextureAsset(label).drawAt(GetPosition());
+	const std::u32string label = m_is_attack ? U"Player_Attack" : U"Player_Normal";
+	if (Scene::Time() < damage_effect_time) // player effect
+	{
+		TextureAsset(label).drawAt(GetPosition(), Palette::Red);
+	}
+	else
+	{
+		TextureAsset(label).drawAt(GetPosition());
+	}
 
     const float hp_rate = static_cast<float>(GetHp()) / static_cast<float>(GetHpCapacity());
     RectF{ GetPosition().x - 50.0f, GetPosition().y - 80.0f, 100.0f, 10.0f }.draw(Palette::Darkgray);
@@ -44,19 +56,15 @@ void GamePlayer::Draw() const
 
     if (m_item_effect_time > 0.0f && !m_item_effect_text.isEmpty())
 	{
-        FontAsset(U"ItemEffectFont")(m_item_effect_text)
-            .drawAt(GetPosition() + Float2{ 0.0f, -120.0f }, Palette::Yellow);
+        FontAsset(U"ItemEffectFont")(m_item_effect_text).drawAt(GetPosition() + Float2{ 0.0f, -120.0f }, Palette::Yellow);
     }
 
     FontAsset(U"PlayerStatusFont")(
-        Format(U"HP: ", GetHp(), U" / ", GetHpCapacity()))
-        .draw(20, 20, Palette::Black);
+        Format(U"HP: ", GetHp(), U" / ", GetHpCapacity())).draw(20, 20, Palette::Black);
     FontAsset(U"PlayerStatusFont")(
-        Format(U"Attack: ", m_attack_power, U"   Score: ", m_score))
-        .draw(20, 50, Palette::Black);
+        Format(U"Attack: ", m_attack_power, U"   Score: ", m_score)).draw(20, 50, Palette::Black);
     FontAsset(U"PlayerStatusFont")(
-        U"WASD: Move   Space: Attack   Touch item: Pick up")
-        .draw(20, 80, Palette::Black);
+        U"WASD: Move   Space: Attack   Touch item: Pick up").draw(20, 80, Palette::Black);
 
     // 取得したアイテムを表示する
     const Float2 inventory_position{
@@ -70,6 +78,52 @@ void GamePlayer::Damage(const GameDamage& damage)
 {
     const int amount = static_cast<int>(damage.GetTotalDamage());
     DecreaseHP(amount);
+
+	damage_effect_time = Scene::Time() + 0.1;
+}
+
+bool GamePlayer::PurchaseItem(GameItemType type)
+{
+	int price{};
+
+	switch (type)
+	{
+	case GameItemType::Potion:
+		price = 1;
+		break;
+
+	case GameItemType::Sword:
+		price = 2;
+		break;
+
+	default:
+		return false;
+	}
+
+	if (!m_inventory.RemoveItem(GameItemType::Coin, price))
+	{
+		return false;
+	}
+
+	m_inventory.AddItem(type);
+
+	switch (type)
+	{
+	case GameItemType::Potion:
+		RecoverHP(30);
+		showItemEffect(U"Purchased Potion: HP +30");
+		break;
+
+	case GameItemType::Sword:
+		m_attack_power += 10;
+		showItemEffect(U"Purchased Sword: Attack +10");
+		break;
+
+	default:
+		break;
+	}
+
+	return true;
 }
 
 void GamePlayer::move(float delta_time)
@@ -84,35 +138,48 @@ void GamePlayer::move(float delta_time)
 	if (!dir.isZero())
 	{
 		dir.normalize();
+
+		m_face_direction = dir;
 	}
 
-	constexpr float PLAYER_MOVE_SPEED{ 128.0f };
+	constexpr float PLAYER_MOVE_SPEED{ 200.0f };
+	constexpr float PLAYER_RADIUS{ 64.0f };
 
-	SetPosition(GetPosition() + dir * PLAYER_MOVE_SPEED * delta_time);
+	Float2 new_position = GetPosition() + dir * PLAYER_MOVE_SPEED * delta_time;
+
+	// 位置制限
+	new_position.x = Clamp(new_position.x, PLAYER_RADIUS, static_cast<float>(Scene::Width()) - PLAYER_RADIUS);
+	new_position.y = Clamp(new_position.y, PLAYER_RADIUS, static_cast<float>(Scene::Height()) - PLAYER_RADIUS);
+
+	SetPosition(new_position);
 }
 
 void GamePlayer::attack(float delta_time)
 {
-    if (m_attack_effect_time > 0.0f) {
+    if (m_attack_effect_time > 0.0f)
+	{
         m_attack_effect_time -= delta_time;
-        if (m_attack_effect_time <= 0.0f) {
+
+        if (m_attack_effect_time <= 0.0f)
+		{
             m_attack_effect_time = 0.0f;
             m_is_attack = false;
         }
     }
 
-    if (m_attack_cool_time > 0.0f) {
+    if (m_attack_cool_time > 0.0f)
+	{
         m_attack_cool_time -= delta_time;
     }
 
-    if (KeySpace.down() && m_attack_cool_time <= 0.0f) {
+    if (KeySpace.down() && m_attack_cool_time <= 0.0f)
+	{
         m_is_attack = true;
         m_attack_effect_time = 0.18f;
         m_attack_cool_time = 0.35f;
 
         const Float2 attack_position = GetPosition() + m_face_direction * 82.0f;
-        GetWorld()->Register(new GameAttack(
-            GetWorld(), attack_position, m_face_direction, "Player", m_attack_power));
+        GetWorld()->Register(new GameAttack(GetWorld(), attack_position, m_face_direction, "Player", m_attack_power));
     }
 }
 

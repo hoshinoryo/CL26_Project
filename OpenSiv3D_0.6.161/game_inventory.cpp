@@ -32,6 +32,43 @@ void GameInventory::AddItem(GameItemType type)
     }
 }
 
+bool GameInventory::RemoveItem(GameItemType type, int amount)
+{
+	if (amount <= 0)
+	{
+		return false;
+	}
+
+	const auto it = std::find_if(
+		m_items.begin(),
+		m_items.end(),
+		[type](const GameInventoryItem& item)
+		{
+			return item.GetType() == type;
+		});
+
+	if (it == m_items.end())
+	{
+		return false;
+	}
+
+	if (it->GetCount() < amount)
+	{
+		return false;
+	}
+
+	if (it->GetCount() == amount)
+	{
+		m_items.erase(it);
+	}
+	else
+	{
+		it->RemoveCount(amount);
+	}
+
+	return true;
+}
+
 int GameInventory::GetItemCount(GameItemType type) const
 {
     const auto it = std::find_if(

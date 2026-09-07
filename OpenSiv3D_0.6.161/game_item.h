@@ -1,9 +1,11 @@
-﻿/*
-    ファイル名：game_item.h
-    作成者：張 楽晨
-    作成日：2026/07/14
-    内容：エネミーを倒した時にランダムで落ち、プレイヤーが取得できるフィールドアイテムクラス
-*/
+﻿//=============================================================================
+// Contents   : game_item.h
+//              アイテムクラス
+// Author     : GU ANYI
+// LastUpdate : 2026/09/07
+// Since      : 2026/07/14
+//=============================================================================
+
 #pragma once
 
 #include "game_object.h"
@@ -12,13 +14,29 @@
 class GameItem : public GameObject
 {
 private:
+
     GameItemType m_type{ GameItemType::Potion };
 
 public:
+
     GameItem(GameWorld* world, const Float2& position, GameItemType type)
         : GameObject(world, position, "Item")
         , m_type(type)
     {
+		switch (m_type)
+		{
+		case GameItemType::Potion:
+			TextureAsset::Register(U"Item_Potion", 0xF1131_icon, 40);
+			break;
+
+		case GameItemType::Sword:
+			TextureAsset::Register(U"Item_Sword", 0xF04E5_icon, 40);
+			break;
+
+		case GameItemType::Coin:
+			TextureAsset::Register(U"Item_Coin", 0xF0813_icon, 40);
+			break;
+		}
     }
 
     void Update(float) override
@@ -29,19 +47,18 @@ public:
     {
         const Circle base{ GetPosition(), 20.0 };
 
-        switch (m_type) {
+        switch (m_type)
+		{
         case GameItemType::Potion:
-            base.draw(Palette::Red);
-            base.drawFrame(3.0, Palette::White);
+			TextureAsset(U"Item_Potion").drawAt(GetPosition(), Palette::Red);
             break;
+
         case GameItemType::Sword:
-            base.draw(Palette::Silver);
-            Line{ GetPosition() + Float2{ -12.0f, 12.0f }, GetPosition() + Float2{ 12.0f, -12.0f } }
-                .draw(5.0, Palette::White);
+			TextureAsset(U"Item_Sword").drawAt(GetPosition(), Palette::Silver);
             break;
+
         case GameItemType::Coin:
-            base.draw(Palette::Gold);
-            base.drawFrame(3.0, Palette::Orange);
+			TextureAsset(U"Item_Coin").drawAt(GetPosition(), Palette::Gold);
             break;
         }
     }

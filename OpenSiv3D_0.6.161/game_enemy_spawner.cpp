@@ -1,29 +1,46 @@
-﻿/*
-    ファイル名：game_enemy_spawner.cpp
-    作成者：張 楽晨
-    作成日：2026/06/11
-    内容：エネミーの生成タイミングと最大数を管理する
-*/
+﻿//=============================================================================
+// Contents   : game_enemy_spawner.h
+//              エネミーの生成管理
+// Author     : GU ANYI
+// LastUpdate : 2026/09/07
+// Since      : 2026/06/11
+//=============================================================================
+
 #include "stdafx.h"
 #include "game_enemy_spawner.h"
 #include "game_world.h"
 #include "game_enemy.h"
 
-GameEnemySpawner::GameEnemySpawner(GameWorld* world, const Float2& position)
+GameEnemySpawner::GameEnemySpawner(GameWorld* world, const Float2& position, int spawn_limit)
 	: GameObject(world, position, "EnemySpawner")
+	, m_spawn_limit(spawn_limit)
 {
 	TextureAsset::Register(U"Enemy_Spawner", 0xF0BCA_icon, 128);
 }
 
 void GameEnemySpawner::Update(float delta_time)
 {
+	if (m_spawn_count >= m_spawn_limit)
+	{
+		Destory();
+		return;
+	}
+
 	m_elpased_time += delta_time;
 
-	if (m_elpased_time > 1.5f) {
-		m_elpased_time -= 1.5f;
+	constexpr float SPAWN_INTERVAL{ 1.5f };
 
-		if (GetWorld()->GetGameObjects("Enemy").GetCount() < 3) {
-			GetWorld()->Register(new GameEnemy(GetWorld(), GetPosition()));
+	if (m_elpased_time > SPAWN_INTERVAL)
+	{
+		m_elpased_time -= SPAWN_INTERVAL;
+
+		GetWorld()->Register(new GameEnemy(GetWorld(), GetPosition()));
+
+		++m_spawn_count;
+
+		if (m_spawn_count >= m_spawn_limit)
+		{
+			Destory();
 		}
 	}
 }

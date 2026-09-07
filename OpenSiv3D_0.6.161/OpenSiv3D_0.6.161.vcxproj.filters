@@ -165,6 +165,15 @@
     <ClCompile Include="game_world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_market.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_round_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\icon.ico">
@@ -864,6 +873,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_market.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_round_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

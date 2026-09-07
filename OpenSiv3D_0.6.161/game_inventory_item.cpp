@@ -45,7 +45,16 @@ int GameInventoryItem::GetCount() const
 
 void GameInventoryItem::AddCount(int amount)
 {
-    if (amount > 0) {
+    if (amount > 0)
+	{
         m_count += amount;
     }
+}
+
+void GameInventoryItem::RemoveCount(int amount)
+{
+	if (amount > 0 && amount <= m_count)
+	{
+		m_count -= amount;
+	}
 }

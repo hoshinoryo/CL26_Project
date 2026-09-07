@@ -30,5 +30,7 @@ public:
     GameItemType GetType() const;
     const String& GetName() const;
     int GetCount() const;
+
     void AddCount(int amount = 1);
+	void RemoveCount(int amount);
 };
