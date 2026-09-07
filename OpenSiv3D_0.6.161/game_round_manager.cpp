@@ -1,4 +1,12 @@
-﻿#include "stdafx.h"
+﻿//=============================================================================
+// Contents   : game_round_manager.cpp
+//              Round機能管理システム
+// Author     : GU ANYI
+// LastUpdate : 2026/09/08
+// Since      : 2026/09/08
+//=============================================================================
+
+#include "stdafx.h"
 #include "game_round_manager.h"
 #include "game_world.h"
 #include "game_player.h"

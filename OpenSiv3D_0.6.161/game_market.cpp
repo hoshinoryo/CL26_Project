@@ -1,4 +1,12 @@
-﻿#include "game_market.h"
+﻿//=============================================================================
+// Contents   : game_market.cpp
+//              マーケット機能定義
+// Author     : GU ANYI
+// LastUpdate : 2026/09/08
+// Since      : 2026/09/08
+//=============================================================================
+
+#include "game_market.h"
 #include "game_world.h"
 #include "game_player.h"
 
